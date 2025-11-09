@@ -22,7 +22,7 @@ jobs:
       run: |
         docker build -t jhayhh/hh .
         docker tag jhayhh/hh jhayhh/hh:datedeals
-        docker push jhayhh/hh:backend
+        docker push jhayhh/hh:datedeals
     - name: 'Setup SSH key'
       run: |
         echo "${{ secrets.AWS_PRIVATE_KEY }}" > JohanKeyPair.pem && chmod 400 JohanKeyPair.pem
