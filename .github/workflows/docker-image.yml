@@ -1,0 +1,37 @@
+name: Docker Image CI
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: 'Dockerhub login'
+      run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u ${{ vars.DOCKERHUB_USER }} --password-stdin
+    - name: Set up JDK
+      uses: actions/setup-java@v4
+      with:
+        java-version: '21'
+        distribution: 'temurin'
+    - name: Maven build
+      run: mvn --batch-mode --update-snapshots verify -DskipTests
+    - name: 'Build and push backend docker'
+      working-directory: backend
+      run: |
+        docker build -t jhayhh/hh .
+        docker tag jhayhh/hh jhayhh/hh:datedeals
+        docker push jhayhh/hh:backend
+    - name: 'Setup SSH key'
+      run: |
+        echo "${{ secrets.AWS_PRIVATE_KEY }}" > JohanKeyPair.pem && chmod 400 JohanKeyPair.pem
+    - name: 'SSH and pull'
+      run: |
+        ssh -o StrictHostKeyChecking=no -i "JohanKeyPair.pem" ${{ vars.AWS_USERNAME }}@${{ vars.AWS_EC2_INSTANCE }} \
+        "echo ${{ secrets.DOCKERHUB_TOKEN }} | docker login -u ${{ vars.DOCKERHUB_USER }} --password-stdin
+        cd hh_build
+        docker-compose stop -t 1
+        docker-compose rm -f
+        docker rmi ${{ vars.DOCKERHUB_USER }}/hh:backend
+        docker-compose up -d --renew-anon-volumes"
