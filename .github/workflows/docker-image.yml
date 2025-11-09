@@ -18,7 +18,6 @@ jobs:
     - name: Maven build
       run: mvn --batch-mode --update-snapshots verify -DskipTests
     - name: 'Build and push backend docker'
-      working-directory: backend
       run: |
         docker build -t jhayhh/hh .
         docker tag jhayhh/hh jhayhh/hh:datedeals
