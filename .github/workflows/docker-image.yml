@@ -29,8 +29,7 @@ jobs:
       run: |
         ssh -o StrictHostKeyChecking=no -i "JohanKeyPair.pem" ${{ vars.AWS_USERNAME }}@${{ vars.AWS_EC2_INSTANCE }} \
         "echo ${{ secrets.DOCKERHUB_TOKEN }} | docker login -u ${{ vars.DOCKERHUB_USER }} --password-stdin
-        cd hh_build
         docker-compose stop -t 1
         docker-compose rm -f
-        docker rmi ${{ vars.DOCKERHUB_USER }}/hh:backend
+        docker rmi ${{ vars.DOCKERHUB_USER }}/hh:datedeals
         docker-compose up -d --renew-anon-volumes"
