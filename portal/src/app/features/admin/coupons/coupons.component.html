@@ -1,0 +1,91 @@
+<div class="coupons-container">
+  <header class="header">
+    <div class="header-content">
+      <h1>Admin - Coupons</h1>
+      <nav class="nav">
+        <a routerLink="/admin/businesses" routerLinkActive="active" class="nav-link">Businesses</a>
+        <a routerLink="/admin/coupons" routerLinkActive="active" class="nav-link">Coupons</a>
+        <a routerLink="/admin/deals/create" routerLinkActive="active" class="nav-link">Create Deal</a>
+        <button class="btn-logout" (click)="logout()">Logout</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <div class="filter-section">
+      <label for="businessSelect">Select Business:</label>
+      <select
+        id="businessSelect"
+        [(ngModel)]="selectedBusinessId"
+        (change)="onBusinessChange()"
+        [disabled]="isLoadingBusinesses"
+      >
+        <option [ngValue]="null">-- Select a business --</option>
+        @for (business of businesses; track business.businessId) {
+          <option [ngValue]="business.businessId">{{ business.businessName }}</option>
+        }
+      </select>
+    </div>
+
+    @if (isLoadingCoupons) {
+      <div class="loading">Loading coupons...</div>
+    }
+
+    @if (errorMessage) {
+      <div class="error-message">{{ errorMessage }}</div>
+    }
+
+    @if (!isLoadingCoupons && selectedBusinessId && coupons.length === 0) {
+      <div class="no-data">No coupons found for this business</div>
+    }
+
+    @if (!isLoadingCoupons && coupons.length > 0) {
+      <div class="table-container">
+        <table class="coupons-table">
+          <thead>
+            <tr>
+              <th>Coupon Code</th>
+              <th>Business</th>
+              <th>Deal</th>
+              <th>Purchase Price</th>
+              <th>Value Price</th>
+              <th>Issue Date</th>
+              <th>Expire Date</th>
+              <th>Redeem Date</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (coupon of coupons; track coupon.couponId) {
+              <tr [class.redeemed]="coupon.redeemed">
+                <td class="coupon-code">{{ coupon.couponCode }}</td>
+                <td>{{ coupon.businessName }}</td>
+                <td>{{ coupon.dealTitle }}</td>
+                <td>R{{ coupon.purchasePrice | number:'1.2-2' }}</td>
+                <td>R{{ coupon.valuePrice | number:'1.2-2' }}</td>
+                <td>{{ coupon.issueDate | date:'short' }}</td>
+                <td>{{ coupon.expireDate | date:'short' }}</td>
+                <td>{{ coupon.redeemDate ? (coupon.redeemDate | date:'short') : '-' }}</td>
+                <td>
+                  <span [class]="coupon.redeemed ? 'status-redeemed' : 'status-active'">
+                    {{ coupon.redeemed ? 'Redeemed' : 'Active' }}
+                  </span>
+                </td>
+                <td>
+                  <button
+                    class="btn-redeem"
+                    [disabled]="coupon.redeemed"
+                    (click)="redeemCoupon(coupon)"
+                  >
+                    {{ coupon.redeemed ? 'Redeemed' : 'Redeem' }}
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </main>
+</div>
