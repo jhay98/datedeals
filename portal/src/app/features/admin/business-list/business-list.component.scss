@@ -1,0 +1,157 @@
+.businesses-container {
+  min-height: 100vh;
+  background-color: #f5f5f5;
+}
+
+.header {
+  background: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+
+  .header-content {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    h1 {
+      margin: 0;
+      color: #333;
+      font-size: 24px;
+    }
+  }
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+
+  .nav-link {
+    color: #667eea;
+    text-decoration: none;
+    font-weight: 500;
+    padding: 8px 16px;
+    border-radius: 6px;
+    transition: background-color 0.3s;
+
+    &:hover {
+      background-color: #f0f0f0;
+    }
+
+    &.active {
+      background-color: #667eea;
+      color: white;
+    }
+  }
+}
+
+.btn-logout {
+  padding: 10px 20px;
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background-color 0.3s;
+
+  &:hover {
+    background-color: #c82333;
+  }
+}
+
+.main-content {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 30px 20px;
+}
+
+.loading,
+.no-data {
+  text-align: center;
+  padding: 40px;
+  color: #666;
+  font-size: 18px;
+}
+
+.error-message {
+  background-color: #fee;
+  color: #c33;
+  padding: 15px;
+  border-radius: 6px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.table-container {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  overflow-x: auto;
+}
+
+.businesses-table {
+  width: 100%;
+  border-collapse: collapse;
+
+  thead {
+    background-color: #667eea;
+    color: white;
+
+    th {
+      padding: 15px;
+      text-align: left;
+      font-weight: 600;
+      font-size: 14px;
+    }
+  }
+
+  tbody {
+    tr {
+      border-bottom: 1px solid #eee;
+      transition: background-color 0.2s;
+
+      &:hover {
+        background-color: #f9f9f9;
+      }
+
+      td {
+        padding: 15px;
+        font-size: 14px;
+        color: #333;
+
+        &.business-name {
+          font-weight: 600;
+          color: #667eea;
+        }
+
+        &.description {
+          max-width: 300px;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+      }
+    }
+  }
+}
+
+.btn-view {
+  padding: 8px 16px;
+  background-color: #667eea;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  transition: background-color 0.3s, transform 0.2s;
+
+  &:hover {
+    background-color: #5568d3;
+    transform: translateY(-1px);
+  }
+}

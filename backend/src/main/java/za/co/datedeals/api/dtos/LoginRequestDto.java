@@ -1,0 +1,9 @@
+package za.co.datedeals.api.dtos;
+
+import lombok.Data;
+
+@Data
+public class LoginRequestDto {
+    private String username;
+    private String password;
+}

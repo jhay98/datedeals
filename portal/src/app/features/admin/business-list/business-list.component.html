@@ -1,0 +1,62 @@
+<div class="businesses-container">
+  <header class="header">
+    <div class="header-content">
+      <h1>Admin - Businesses</h1>
+      <nav class="nav">
+        <a routerLink="/admin/businesses" routerLinkActive="active" class="nav-link">Businesses</a>
+        <a routerLink="/admin/coupons" routerLinkActive="active" class="nav-link">Coupons</a>
+        <a routerLink="/admin/deals/create" routerLinkActive="active" class="nav-link">Create Deal</a>
+        <button class="btn-logout" (click)="logout()">Logout</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="main-content">
+    @if (isLoading) {
+      <div class="loading">Loading businesses...</div>
+    }
+
+    @if (errorMessage) {
+      <div class="error-message">{{ errorMessage }}</div>
+    }
+
+    @if (!isLoading && !errorMessage && businesses.length === 0) {
+      <div class="no-data">No businesses found</div>
+    }
+
+    @if (!isLoading && businesses.length > 0) {
+      <div class="table-container">
+        <table class="businesses-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Business Name</th>
+              <th>Email</th>
+              <th>Phone</th>
+              <th>Address</th>
+              <th>Description</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (business of businesses; track business.businessId) {
+              <tr>
+                <td>{{ business.businessId }}</td>
+                <td class="business-name">{{ business.businessName }}</td>
+                <td>{{ business.contactEmail }}</td>
+                <td>{{ business.contactPhone }}</td>
+                <td>{{ business.address }}</td>
+                <td class="description">{{ business.description }}</td>
+                <td>
+                  <button class="btn-view" (click)="viewCoupons(business.businessId)">
+                    View Coupons
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </main>
+</div>
