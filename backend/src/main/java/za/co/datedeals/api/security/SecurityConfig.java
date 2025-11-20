@@ -72,7 +72,13 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:4200")); // Angular default port
+        configuration.setAllowedOrigins(List.of(
+            "http://localhost:4200",
+            "https://admin.datedeals.co.za",
+            "https://www.admin.datedeals.co.za",
+            "https://datedeals.co.za",
+            "https://www.datedeals.co.za"
+        )); 
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
         configuration.setExposedHeaders(List.of("Authorization"));
