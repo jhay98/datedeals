@@ -23,7 +23,7 @@ jobs:
         distribution: 'temurin'
     - name: Maven build
       working-directory: backend
-      run: mvn --batch-mode --update-snapshots verify -DskipTests
+      run: mvn --batch-mode --update-snapshots verify -DskipTests -e -X
     - name: 'Build and push backend docker'
       working-directory: backend
       run: |
