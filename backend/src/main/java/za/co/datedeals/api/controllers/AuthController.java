@@ -15,7 +15,6 @@ import za.co.datedeals.api.services.AuthService;
 
 @RestController
 @RequestMapping("/auth")
-@CrossOrigin(origins = "http://localhost:4200")
 @Tag(name = "Authentication", description = "Authentication management APIs")
 public class AuthController {
 

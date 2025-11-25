@@ -1,7 +1,6 @@
 package za.co.datedeals.api.entities.coupon;
 import jakarta.persistence.*;
 import lombok.Data;
-import za.co.datedeals.api.entities.business.Business;
 import za.co.datedeals.api.entities.deal.Deal;
 
 import java.time.LocalDateTime;
@@ -34,10 +33,6 @@ public class Coupon {
     @ManyToOne
     @JoinColumn(name = "deal_id", nullable = false)
     private Deal deal;
-    
-    @ManyToOne
-    @JoinColumn(name = "business_id", nullable = false)
-    private Business business;
     
     private Boolean redeemed = false;
 

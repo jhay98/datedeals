@@ -1,4 +1,4 @@
-package za.co.datedeals.api.entities.log;
+package za.co.datedeals.api.controllers;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
