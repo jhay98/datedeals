@@ -15,4 +15,30 @@ export class BusinessService {
       `${environment.apiUrl}/business/all`
     );
   }
+
+  getBusinessById(id: number): Observable<Business> {
+    return this.http.get<Business>(
+      `${environment.apiUrl}/business/${id}`
+    );
+  }
+
+  createBusiness(business: Omit<Business, 'businessId'>): Observable<Business> {
+    return this.http.post<Business>(
+      `${environment.apiUrl}/business`,
+      business
+    );
+  }
+
+  updateBusiness(id: number, business: Partial<Business>): Observable<Business> {
+    return this.http.put<Business>(
+      `${environment.apiUrl}/business/${id}`,
+      business
+    );
+  }
+
+  deleteBusiness(id: number): Observable<void> {
+    return this.http.delete<void>(
+      `${environment.apiUrl}/business/${id}`
+    );
+  }
 }

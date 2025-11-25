@@ -1,27 +1,33 @@
-package za.co.datedeals.api.entities.coupon;
+package za.co.datedeals.api.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import za.co.datedeals.api.dtos.CouponResponseDto;
+import za.co.datedeals.api.entities.coupon.Coupon;
+import za.co.datedeals.api.entities.coupon.CouponRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public class CouponServiceImpl implements CouponService {
+public class CouponService {
 
     @Autowired
     private CouponRepository couponRepository;
 
-    @Override
     public List<CouponResponseDto> getCouponsByBusinessId(Long businessId) {
-        return couponRepository.findByBusiness_BusinessId(businessId).stream()
+        return couponRepository.findByDeal_Business_BusinessId(businessId).stream()
                 .map(this::convertToDto)
                 .collect(Collectors.toList());
     }
 
-    @Override
+    public List<CouponResponseDto> getCouponsByDealId(Long dealId) {
+        return couponRepository.findByDeal_DealId(dealId).stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
+    }
+
     public CouponResponseDto redeemCoupon(Long couponId) {
         Coupon coupon = couponRepository.findById(couponId)
                 .orElseThrow(() -> new RuntimeException("Coupon not found"));
@@ -41,7 +47,6 @@ public class CouponServiceImpl implements CouponService {
         return convertToDto(coupon);
     }
 
-    @Override
     public Coupon getCouponById(Long couponId) {
         return couponRepository.findById(couponId)
                 .orElseThrow(() -> new RuntimeException("Coupon not found"));
@@ -59,8 +64,8 @@ public class CouponServiceImpl implements CouponService {
                 coupon.getRedeemed(),
                 coupon.getDeal() != null ? coupon.getDeal().getTitle() : null,
                 coupon.getDeal() != null ? coupon.getDeal().getDealId() : null,
-                coupon.getBusiness() != null ? coupon.getBusiness().getBusinessName() : null,
-                coupon.getBusiness() != null ? coupon.getBusiness().getBusinessId() : null
+                coupon.getDeal() != null && coupon.getDeal().getBusiness() != null ? coupon.getDeal().getBusiness().getBusinessName() : null,
+                coupon.getDeal() != null && coupon.getDeal().getBusiness() != null ? coupon.getDeal().getBusiness().getBusinessId() : null
         );
     }
 }

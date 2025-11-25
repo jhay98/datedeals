@@ -1,26 +1,27 @@
-package za.co.datedeals.api.entities.deal;
+package za.co.datedeals.api.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import za.co.datedeals.api.dtos.DealRequestDto;
 import za.co.datedeals.api.entities.business.Business;
 import za.co.datedeals.api.entities.business.BusinessRepository;
+import za.co.datedeals.api.entities.deal.Deal;
+import za.co.datedeals.api.entities.deal.DealRepository;
 
 import java.util.List;
 
 @Service
-public class DealServiceImpl implements DealService {
+public class DealService {
 
     private final DealRepository dealRepository;
 
     @Autowired
     private BusinessRepository businessRepository;
 
-    public DealServiceImpl(DealRepository dealRepository) {
+    public DealService(DealRepository dealRepository) {
         this.dealRepository = dealRepository;
     }
 
-    @Override
     public Deal createDeal(DealRequestDto dealRequestDto) {
         Business business = businessRepository.findById(dealRequestDto.getBusinessId())
                 .orElseThrow(() -> new RuntimeException("Business not found"));
@@ -37,24 +38,56 @@ public class DealServiceImpl implements DealService {
         return dealRepository.save(deal);
     }
 
-    @Override
     public Deal getDealById(Long id) {
         return dealRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Deal not found"));
     }
 
-    @Override
     public List<Deal> getAllDeals() {
         return dealRepository.findAll();
     }
 
-    @Override
     public List<Deal> getDealsByBusinessId(Long businessId) {
         return dealRepository.findByBusiness_BusinessId(businessId);
+    }
+
+    public Deal updateDeal(Long id, DealRequestDto dealRequestDto) {
+        Deal deal = dealRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Deal not found"));
+
+        if (dealRequestDto.getBusinessId() != null) {
+            Business business = businessRepository.findById(dealRequestDto.getBusinessId())
+                    .orElseThrow(() -> new RuntimeException("Business not found"));
+            deal.setBusiness(business);
+        }
+
+        if (dealRequestDto.getCode() != null) {
+            deal.setCode(dealRequestDto.getCode());
+        }
+        if (dealRequestDto.getTitle() != null) {
+            deal.setTitle(dealRequestDto.getTitle());
+        }
+        if (dealRequestDto.getHtmlVoucherTemplate() != null) {
+            deal.setHtmlVoucherTemplate(dealRequestDto.getHtmlVoucherTemplate());
+        }
+        if (dealRequestDto.getExpiryDate() != null) {
+            deal.setExpiryDate(dealRequestDto.getExpiryDate());
+        }
+        if (dealRequestDto.getLifetimeDays() != null) {
+            deal.setLifetimeDays(dealRequestDto.getLifetimeDays());
+        }
+        if (dealRequestDto.getCommissionPercentage() != null) {
+            deal.setCommissionPercentage(dealRequestDto.getCommissionPercentage());
+        }
+
+        return dealRepository.save(deal);
+    }
+
+    public void deleteDeal(Long id) {
+        dealRepository.deleteById(id);
     }
 
     private String generateCode() {
         return java.util.UUID.randomUUID().toString().replace("-", "").substring(0, 8).toUpperCase();
     }
-
 }

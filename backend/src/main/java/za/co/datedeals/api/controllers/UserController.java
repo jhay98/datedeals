@@ -4,25 +4,24 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import za.co.datedeals.api.dtos.BusinessResponseDto;
-import za.co.datedeals.api.entities.business.Business;
-import za.co.datedeals.api.services.BusinessService;
+import za.co.datedeals.api.entities.user.User;
+import za.co.datedeals.api.services.UserService;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/business")
-public class BusinessController {
+@RequestMapping("/user")
+public class UserController {
 
     @Autowired
-    private BusinessService businessService;
+    private UserService userService;
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Business> createBusiness(@RequestBody Business business) {
+    public ResponseEntity<User> createUser(@RequestBody User user) {
         try {
-            Business createdBusiness = businessService.createBusiness(business);
-            return ResponseEntity.ok(createdBusiness);
+            User createdUser = userService.createUser(user);
+            return ResponseEntity.ok(createdUser);
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().build();
         }
@@ -30,10 +29,10 @@ public class BusinessController {
 
     @GetMapping("/all")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<List<BusinessResponseDto>> getAllBusinesses() {
+    public ResponseEntity<List<User>> getAllUsers() {
         try {
-            List<BusinessResponseDto> businesses = businessService.getAllBusinesses();
-            return ResponseEntity.ok(businesses);
+            List<User> users = userService.getAllUsers();
+            return ResponseEntity.ok(users);
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }
@@ -41,10 +40,11 @@ public class BusinessController {
 
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Business> getBusinessById(@PathVariable Long id) {
+    public ResponseEntity<User> getUserById(@PathVariable Long id) {
         try {
-            Business business = businessService.getBusinessById(id);
-            return ResponseEntity.ok(business);
+            User user = userService.getUserById(id)
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+            return ResponseEntity.ok(user);
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }
@@ -52,10 +52,10 @@ public class BusinessController {
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Business> updateBusiness(@PathVariable Long id, @RequestBody Business businessDetails) {
+    public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User userDetails) {
         try {
-            Business updatedBusiness = businessService.updateBusiness(id, businessDetails);
-            return ResponseEntity.ok(updatedBusiness);
+            User updatedUser = userService.updateUser(id, userDetails);
+            return ResponseEntity.ok(updatedUser);
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().build();
         }
@@ -63,9 +63,9 @@ public class BusinessController {
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Void> deleteBusiness(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
         try {
-            businessService.deleteBusiness(id);
+            userService.deleteUser(id);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();

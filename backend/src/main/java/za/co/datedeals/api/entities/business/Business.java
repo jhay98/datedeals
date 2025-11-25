@@ -3,14 +3,13 @@ package za.co.datedeals.api.entities.business;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Data;
-import za.co.datedeals.api.entities.coupon.Coupon;
 import za.co.datedeals.api.entities.deal.Deal;
 
 import java.util.List;
 
 @Entity
 @Data
-@JsonIgnoreProperties({"deals", "coupons"})
+@JsonIgnoreProperties({"deals"})
 public class Business {
     @Id
     @SequenceGenerator(
@@ -36,7 +35,4 @@ public class Business {
     
     @OneToMany(mappedBy = "business", cascade = CascadeType.ALL)
     private List<Deal> deals;
-    
-    @OneToMany(mappedBy = "business", cascade = CascadeType.ALL)
-    private List<Coupon> coupons;
 }
