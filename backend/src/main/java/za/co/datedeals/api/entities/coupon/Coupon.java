@@ -31,7 +31,7 @@ public class Coupon {
     private LocalDateTime expireDate;
     
     @ManyToOne
-    @JoinColumn(name = "deal_id", nullable = false)
+    @JoinColumn(name = "deal_id")
     private Deal deal;
     
     private Boolean redeemed = false;
