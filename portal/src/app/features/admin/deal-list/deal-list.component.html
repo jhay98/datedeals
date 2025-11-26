@@ -1,0 +1,80 @@
+<div class="deals-container">
+  <header class="header">
+    <div class="header-content">
+      <h1>Admin - Deals</h1>
+      <nav class="nav">
+        <a routerLink="/admin/businesses" routerLinkActive="active" class="nav-link">Businesses</a>
+        <a routerLink="/admin/deals" routerLinkActive="active" class="nav-link">Deals</a>
+        <a routerLink="/admin/coupons" routerLinkActive="active" class="nav-link">Coupons</a>
+        <button class="btn-logout" (click)="logout()">Logout</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <div class="content-header">
+      <div class="filter-section">
+        <label for="businessSelect">Select Business:</label>
+        <select
+          id="businessSelect"
+          [(ngModel)]="selectedBusinessId"
+          (change)="onBusinessChange()"
+          [disabled]="isLoadingBusinesses"
+        >
+          <option [ngValue]="null">-- Select a business --</option>
+          @for (business of businesses; track business.businessId) {
+            <option [ngValue]="business.businessId">{{ business.businessName }}</option>
+          }
+        </select>
+      </div>
+      @if (selectedBusinessId) {
+        <button class="btn-create" routerLink="/admin/deals/create">
+          + Create New Deal
+        </button>
+      }
+    </div>
+
+    @if (isLoadingDeals) {
+      <div class="loading">Loading deals...</div>
+    }
+
+    @if (errorMessage) {
+      <div class="error-message">{{ errorMessage }}</div>
+    }
+
+    @if (!isLoadingDeals && selectedBusinessId && deals.length === 0) {
+      <div class="no-data">No deals found for this business</div>
+    }
+
+    @if (!isLoadingDeals && deals.length > 0) {
+      <div class="table-container">
+        <table class="deals-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Code</th>
+              <th>Title</th>
+              <th>Business</th>
+              <th>Expiry Date</th>
+              <th>Lifetime (Days)</th>
+              <th>Commission %</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (deal of deals; track deal.dealId) {
+              <tr>
+                <td>{{ deal.dealId }}</td>
+                <td class="deal-code">{{ deal.code }}</td>
+                <td class="deal-title">{{ deal.title }}</td>
+                <td>{{ deal.business.businessName }}</td>
+                <td>{{ deal.expiryDate ? (deal.expiryDate | date:'short') : '-' }}</td>
+                <td>{{ deal.lifetimeDays ?? '-' }}</td>
+                <td>{{ deal.commissionPercentage ? (deal.commissionPercentage + '%') : '-' }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </main>
+</div>

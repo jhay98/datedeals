@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { DealRequest } from '../models/deal.model';
+import { DealRequest, Deal } from '../models/deal.model';
 import { environment } from '../../../environments/environment';
 
 @Injectable({
@@ -14,6 +14,18 @@ export class DealService {
     return this.http.post(
       `${environment.apiUrl}/deal`,
       deal
+    );
+  }
+
+  getAllDeals(): Observable<Deal[]> {
+    return this.http.get<Deal[]>(
+      `${environment.apiUrl}/deal/all`
+    );
+  }
+
+  getDealsByBusinessId(businessId: number): Observable<Deal[]> {
+    return this.http.get<Deal[]>(
+      `${environment.apiUrl}/deal/business/${businessId}`
     );
   }
 }

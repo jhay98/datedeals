@@ -1,4 +1,4 @@
-.businesses-container {
+.deals-container {
   min-height: 100vh;
   background-color: #f5f5f5;
 }
@@ -74,11 +74,45 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 25px;
+  gap: 20px;
 
-  h2 {
-    margin: 0;
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+.filter-section {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  flex: 1;
+
+  label {
+    font-weight: 600;
     color: #333;
-    font-size: 20px;
+    white-space: nowrap;
+  }
+
+  select {
+    flex: 1;
+    max-width: 400px;
+    padding: 10px 15px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: border-color 0.3s;
+
+    &:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+
+    &:disabled {
+      background-color: #f5f5f5;
+      cursor: not-allowed;
+    }
   }
 }
 
@@ -92,6 +126,7 @@
   font-size: 14px;
   font-weight: 600;
   transition: all 0.3s;
+  white-space: nowrap;
 
   &:hover {
     transform: translateY(-2px);
@@ -123,7 +158,7 @@
   overflow-x: auto;
 }
 
-.businesses-table {
+.deals-table {
   width: 100%;
   border-collapse: collapse;
 
@@ -153,35 +188,15 @@
         font-size: 14px;
         color: #333;
 
-        &.business-name {
+        &.deal-code {
           font-weight: 600;
           color: #667eea;
         }
 
-        &.description {
-          max-width: 300px;
-          overflow: hidden;
-          text-overflow: ellipsis;
-          white-space: nowrap;
+        &.deal-title {
+          font-weight: 500;
         }
       }
     }
-  }
-}
-
-.btn-view {
-  padding: 8px 16px;
-  background-color: #667eea;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 13px;
-  font-weight: 500;
-  transition: background-color 0.3s, transform 0.2s;
-
-  &:hover {
-    background-color: #5568d3;
-    transform: translateY(-1px);
   }
 }

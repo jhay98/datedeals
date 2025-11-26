@@ -90,9 +90,9 @@ export class DealCreateComponent implements OnInit {
           commissionPercentage: null,
           businessId: 0
         };
-        // Navigate to businesses list after 2 seconds
+        // Navigate to deals list after 2 seconds
         setTimeout(() => {
-          this.router.navigate(['/admin/businesses']);
+          this.router.navigate(['/admin/deals']);
         }, 2000);
       },
       error: (error) => {
