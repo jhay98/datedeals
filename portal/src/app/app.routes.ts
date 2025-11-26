@@ -32,12 +32,20 @@ export const routes: Routes = [
         loadComponent: () => import('./features/admin/business-list/business-list.component').then(m => m.BusinessListComponent)
       },
       {
-        path: 'coupons',
-        loadComponent: () => import('./features/admin/coupons/coupons.component').then(m => m.AdminCouponsComponent)
+        path: 'businesses/create',
+        loadComponent: () => import('./features/admin/business-create/business-create.component').then(m => m.BusinessCreateComponent)
+      },
+      {
+        path: 'deals',
+        loadComponent: () => import('./features/admin/deal-list/deal-list.component').then(m => m.DealListComponent)
       },
       {
         path: 'deals/create',
         loadComponent: () => import('./features/admin/deal-create/deal-create.component').then(m => m.DealCreateComponent)
+      },
+      {
+        path: 'coupons',
+        loadComponent: () => import('./features/admin/coupons/coupons.component').then(m => m.AdminCouponsComponent)
       }
     ]
   },
