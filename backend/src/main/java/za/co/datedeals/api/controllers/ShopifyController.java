@@ -25,7 +25,7 @@ import java.util.Map;
 @Tag(name = "Shopify", description = "Shopify webhook integration APIs")
 public class ShopifyController {
     private static final Logger logger = LoggerFactory.getLogger(ShopifyController.class);
-    private static final String HMAC_HEADER = "HTTP_X_SHOPIFY_HMAC_SHA256";
+    private static final String HMAC_HEADER = "x-shopify-hmac-sha256";
 
     @Autowired
     private ShopifyService shopifyService;
