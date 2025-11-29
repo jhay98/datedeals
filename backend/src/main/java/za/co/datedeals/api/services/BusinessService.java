@@ -1,6 +1,8 @@
 package za.co.datedeals.api.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import za.co.datedeals.api.dtos.BusinessResponseDto;
 import za.co.datedeals.api.entities.business.Business;
@@ -31,6 +33,11 @@ public class BusinessService {
         return businessRepository.findAll().stream()
                 .map(this::convertToDto)
                 .collect(Collectors.toList());
+    }
+
+    public Page<BusinessResponseDto> getAllBusinessesPaginated(Pageable pageable) {
+        return businessRepository.findAll(pageable)
+                .map(this::convertToDto);
     }
 
     public Business updateBusiness(Long id, Business businessDetails) {

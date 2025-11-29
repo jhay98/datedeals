@@ -1,5 +1,7 @@
 package za.co.datedeals.api.entities.user;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -13,4 +15,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     boolean existsByUsername(String username);
     
     List<User> findByBusiness_BusinessId(Long businessId);
+    
+    Page<User> findByBusiness_BusinessId(Long businessId, Pageable pageable);
 }

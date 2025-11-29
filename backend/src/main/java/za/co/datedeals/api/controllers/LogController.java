@@ -37,11 +37,12 @@ public class LogController {
         boolean isValid = ShopifyWebhookVerifier.verifyWebhook(entity, hmacHeader, webhookSecret);
         logger.info("HMAC Verification Result: {}", isValid);
 
-        // mailService.sendEmail(
-        //     "johanhay98@gmail.com",
-        //     "New Request Logged",
-        //     "<h1>Request Received</h1><p>" + entity + "</p>"
-        // );
+     
+        // try {
+        //     mailService.sendMail("hi", "hi there");
+        // } catch (Exception e) {
+        //     logger.error("Failed to send test email", e);
+        // }
         return entity;
     }
 }

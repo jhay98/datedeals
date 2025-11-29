@@ -1,6 +1,8 @@
 package za.co.datedeals.api.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import za.co.datedeals.api.entities.user.User;
@@ -40,6 +42,10 @@ public class UserService {
 
     public List<User> getUsersByBusinessId(Long businessId) {
         return userRepository.findByBusiness_BusinessId(businessId);
+    }
+
+    public Page<User> getUsersByBusinessIdPaginated(Long businessId, Pageable pageable) {
+        return userRepository.findByBusiness_BusinessId(businessId, pageable);
     }
 
     public User updateUser(Long id, User userDetails) {

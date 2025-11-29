@@ -1,6 +1,8 @@
 package za.co.datedeals.api.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import za.co.datedeals.api.dtos.DealRequestDto;
 import za.co.datedeals.api.entities.business.Business;
@@ -49,6 +51,10 @@ public class DealService {
 
     public List<Deal> getDealsByBusinessId(Long businessId) {
         return dealRepository.findByBusiness_BusinessId(businessId);
+    }
+
+    public Page<Deal> getDealsByBusinessIdPaginated(Long businessId, Pageable pageable) {
+        return dealRepository.findByBusiness_BusinessId(businessId, pageable);
     }
 
     public Deal updateDeal(Long id, DealRequestDto dealRequestDto) {

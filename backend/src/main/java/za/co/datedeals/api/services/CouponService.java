@@ -1,6 +1,8 @@
 package za.co.datedeals.api.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import za.co.datedeals.api.dtos.CouponResponseDto;
 import za.co.datedeals.api.entities.coupon.Coupon;
@@ -20,6 +22,11 @@ public class CouponService {
         return couponRepository.findByDeal_Business_BusinessId(businessId).stream()
                 .map(this::convertToDto)
                 .collect(Collectors.toList());
+    }
+
+    public Page<CouponResponseDto> getCouponsByBusinessIdPaginated(Long businessId, Pageable pageable) {
+        return couponRepository.findByDeal_Business_BusinessId(businessId, pageable)
+                .map(this::convertToDto);
     }
 
     public List<CouponResponseDto> getCouponsByDealId(Long dealId) {
