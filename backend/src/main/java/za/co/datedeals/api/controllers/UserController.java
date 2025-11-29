@@ -1,9 +1,14 @@
 package za.co.datedeals.api.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import za.co.datedeals.api.dtos.PageResponse;
 import za.co.datedeals.api.entities.user.User;
 import za.co.datedeals.api.services.UserService;
 
@@ -44,6 +49,35 @@ public class UserController {
         try {
             List<User> users = userService.getUsersByBusinessId(businessId);
             return ResponseEntity.ok(users);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @GetMapping("/business/{businessId}/paginated")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<PageResponse<User>> getUsersByBusinessIdPaginated(
+            @PathVariable Long businessId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "userId") String sortBy,
+            @RequestParam(defaultValue = "ASC") String sortDirection) {
+        try {
+            Sort.Direction direction = sortDirection.equalsIgnoreCase("DESC") ? Sort.Direction.DESC : Sort.Direction.ASC;
+            Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortBy));
+            Page<User> userPage = userService.getUsersByBusinessIdPaginated(businessId, pageable);
+            
+            PageResponse<User> response = new PageResponse<>(
+                    userPage.getContent(),
+                    userPage.getNumber(),
+                    userPage.getSize(),
+                    userPage.getTotalElements(),
+                    userPage.getTotalPages(),
+                    userPage.isLast(),
+                    userPage.isFirst()
+            );
+            
+            return ResponseEntity.ok(response);
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }
