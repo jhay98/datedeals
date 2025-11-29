@@ -20,12 +20,21 @@ export class DealListComponent implements OnInit {
   private businessService = inject(BusinessService);
   private authService = inject(AuthService);
 
+  Math = Math;
+
   businesses: Business[] = [];
   deals: Deal[] = [];
   selectedBusinessId: number | null = null;
   isLoadingBusinesses = false;
   isLoadingDeals = false;
   errorMessage = '';
+
+  // Pagination
+  currentPage = 0;
+  pageSize = 10;
+  totalElements = 0;
+  totalPages = 0;
+  pageSizeOptions = [10, 25, 50, 100];
 
   ngOnInit(): void {
     this.loadBusinesses();
@@ -48,10 +57,13 @@ export class DealListComponent implements OnInit {
 
   onBusinessChange(): void {
     this.errorMessage = '';
+    this.currentPage = 0;
     if (this.selectedBusinessId) {
       this.loadDeals();
     } else {
       this.deals = [];
+      this.totalElements = 0;
+      this.totalPages = 0;
     }
   }
 
@@ -59,9 +71,18 @@ export class DealListComponent implements OnInit {
     if (!this.selectedBusinessId) return;
     
     this.isLoadingDeals = true;
-    this.dealService.getDealsByBusinessId(this.selectedBusinessId).subscribe({
-      next: (data) => {
-        this.deals = data;
+    this.dealService.getDealsByBusinessIdPaginated(
+      this.selectedBusinessId,
+      this.currentPage,
+      this.pageSize,
+      'dealId',
+      'ASC'
+    ).subscribe({
+      next: (response) => {
+        this.deals = response.content;
+        this.totalElements = response.totalElements;
+        this.totalPages = response.totalPages;
+        this.currentPage = response.pageNumber;
         this.isLoadingDeals = false;
       },
       error: (error) => {
@@ -70,6 +91,28 @@ export class DealListComponent implements OnInit {
         console.error('Error loading deals:', error);
       }
     });
+  }
+
+  onPageChange(page: number): void {
+    this.currentPage = page;
+    this.loadDeals();
+  }
+
+  onPageSizeChange(): void {
+    this.currentPage = 0;
+    this.loadDeals();
+  }
+
+  previousPage(): void {
+    if (this.currentPage > 0) {
+      this.onPageChange(this.currentPage - 1);
+    }
+  }
+
+  nextPage(): void {
+    if (this.currentPage < this.totalPages - 1) {
+      this.onPageChange(this.currentPage + 1);
+    }
   }
 
   logout(): void {

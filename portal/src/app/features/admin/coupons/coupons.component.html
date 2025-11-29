@@ -87,6 +87,49 @@
           </tbody>
         </table>
       </div>
+
+      <div class="pagination-controls">
+        <div class="pagination-info">
+          <span>Showing {{ (currentPage * pageSize) + 1 }} to {{ Math.min((currentPage + 1) * pageSize, totalElements) }} of {{ totalElements }} coupons</span>
+        </div>
+
+        <div class="pagination-actions">
+          <div class="page-size-selector">
+            <label for="pageSize">Items per page:</label>
+            <select
+              id="pageSize"
+              [(ngModel)]="pageSize"
+              (change)="onPageSizeChange()"
+            >
+              @for (option of pageSizeOptions; track option) {
+                <option [value]="option">{{ option }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="pagination-buttons">
+            <button
+              class="btn-page"
+              (click)="previousPage()"
+              [disabled]="currentPage === 0"
+            >
+              Previous
+            </button>
+
+            <span class="page-indicator">
+              Page {{ currentPage + 1 }} of {{ totalPages }}
+            </span>
+
+            <button
+              class="btn-page"
+              (click)="nextPage()"
+              [disabled]="currentPage >= totalPages - 1"
+            >
+              Next
+            </button>
+          </div>
+        </div>
+      </div>
     }
   </main>
 </div>
