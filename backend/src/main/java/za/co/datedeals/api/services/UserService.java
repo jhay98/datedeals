@@ -38,6 +38,10 @@ public class UserService {
         return userRepository.findAll();
     }
 
+    public List<User> getUsersByBusinessId(Long businessId) {
+        return userRepository.findByBusiness_BusinessId(businessId);
+    }
+
     public User updateUser(Long id, User userDetails) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found"));
