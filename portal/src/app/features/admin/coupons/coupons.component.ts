@@ -21,12 +21,21 @@ export class AdminCouponsComponent implements OnInit {
   private authService = inject(AuthService);
   private route = inject(ActivatedRoute);
 
+  Math = Math;
+
   businesses: Business[] = [];
   coupons: Coupon[] = [];
   selectedBusinessId: number | null = null;
   isLoadingBusinesses = false;
   isLoadingCoupons = false;
   errorMessage = '';
+
+  // Pagination
+  currentPage = 0;
+  pageSize = 10;
+  totalElements = 0;
+  totalPages = 0;
+  pageSizeOptions = [10, 25, 50, 100];
 
   ngOnInit(): void {
     this.loadBusinesses();
@@ -56,10 +65,13 @@ export class AdminCouponsComponent implements OnInit {
   }
 
   onBusinessChange(): void {
+    this.currentPage = 0;
     if (this.selectedBusinessId) {
       this.loadCoupons();
     } else {
       this.coupons = [];
+      this.totalElements = 0;
+      this.totalPages = 0;
     }
   }
 
@@ -71,9 +83,18 @@ export class AdminCouponsComponent implements OnInit {
     this.isLoadingCoupons = true;
     this.errorMessage = '';
 
-    this.couponService.getCouponsByBusiness(this.selectedBusinessId).subscribe({
-      next: (data) => {
-        this.coupons = data;
+    this.couponService.getCouponsByBusinessPaginated(
+      this.selectedBusinessId,
+      this.currentPage,
+      this.pageSize,
+      'couponId',
+      'DESC'
+    ).subscribe({
+      next: (response) => {
+        this.coupons = response.content;
+        this.totalElements = response.totalElements;
+        this.totalPages = response.totalPages;
+        this.currentPage = response.pageNumber;
         this.isLoadingCoupons = false;
       },
       error: (error) => {
@@ -82,6 +103,28 @@ export class AdminCouponsComponent implements OnInit {
         console.error('Error loading coupons:', error);
       }
     });
+  }
+
+  onPageChange(page: number): void {
+    this.currentPage = page;
+    this.loadCoupons();
+  }
+
+  onPageSizeChange(): void {
+    this.currentPage = 0;
+    this.loadCoupons();
+  }
+
+  previousPage(): void {
+    if (this.currentPage > 0) {
+      this.onPageChange(this.currentPage - 1);
+    }
+  }
+
+  nextPage(): void {
+    if (this.currentPage < this.totalPages - 1) {
+      this.onPageChange(this.currentPage + 1);
+    }
   }
 
   redeemCoupon(coupon: Coupon): void {

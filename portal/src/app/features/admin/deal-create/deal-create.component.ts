@@ -37,6 +37,9 @@ export class DealCreateComponent implements OnInit {
     businessId: 0
   };
 
+  templateVariablesHelp = 'Available variables: \n{{qr_code}} - QR code image, {{deal_code}} - Deal code, {{deal_title}} - Deal title, {{business_name}} - Business name, {{expiry_date}} - Expiry date';
+  templatePlaceholder = "Example: <div><h1>{{deal_title}}</h1><p>Code: {{deal_code}}</p><img src='{{qr_code}}' /></div>";
+
   ngOnInit(): void {
     this.loadBusinesses();
   }

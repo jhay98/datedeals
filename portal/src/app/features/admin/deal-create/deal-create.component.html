@@ -70,14 +70,17 @@
         </div>
 
         <div class="form-group">
-          <label for="htmlVoucherTemplate">HTML Voucher Template</label>
+          <label for="htmlVoucherTemplate">
+            HTML Voucher Template
+            <span class="info-tooltip" [title]="templateVariablesHelp">ℹ️</span>
+          </label>
           <textarea
             id="htmlVoucherTemplate"
             name="htmlVoucherTemplate"
             [(ngModel)]="deal.htmlVoucherTemplate"
             [disabled]="isSubmitting"
             rows="6"
-            placeholder="HTML template for the voucher (optional)"
+            [placeholder]="templatePlaceholder"
           ></textarea>
         </div>
 

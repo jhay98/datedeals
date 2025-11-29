@@ -20,12 +20,21 @@ export class UserListComponent implements OnInit {
   private businessService = inject(BusinessService);
   private authService = inject(AuthService);
 
+  Math = Math;
+
   businesses: Business[] = [];
   users: User[] = [];
   selectedBusinessId: number | null = null;
   isLoadingBusinesses = false;
   isLoadingUsers = false;
   errorMessage = '';
+
+  // Pagination
+  currentPage = 0;
+  pageSize = 10;
+  totalElements = 0;
+  totalPages = 0;
+  pageSizeOptions = [10, 25, 50, 100];
 
   ngOnInit(): void {
     this.loadBusinesses();
@@ -48,10 +57,13 @@ export class UserListComponent implements OnInit {
 
   onBusinessChange(): void {
     this.errorMessage = '';
+    this.currentPage = 0;
     if (this.selectedBusinessId) {
       this.loadUsers();
     } else {
       this.users = [];
+      this.totalElements = 0;
+      this.totalPages = 0;
     }
   }
 
@@ -59,9 +71,18 @@ export class UserListComponent implements OnInit {
     if (!this.selectedBusinessId) return;
     
     this.isLoadingUsers = true;
-    this.userService.getUsersByBusinessId(this.selectedBusinessId).subscribe({
-      next: (data) => {
-        this.users = data;
+    this.userService.getUsersByBusinessIdPaginated(
+      this.selectedBusinessId,
+      this.currentPage,
+      this.pageSize,
+      'userId',
+      'ASC'
+    ).subscribe({
+      next: (response) => {
+        this.users = response.content;
+        this.totalElements = response.totalElements;
+        this.totalPages = response.totalPages;
+        this.currentPage = response.pageNumber;
         this.isLoadingUsers = false;
       },
       error: (error) => {
@@ -70,6 +91,28 @@ export class UserListComponent implements OnInit {
         console.error('Error loading users:', error);
       }
     });
+  }
+
+  onPageChange(page: number): void {
+    this.currentPage = page;
+    this.loadUsers();
+  }
+
+  onPageSizeChange(): void {
+    this.currentPage = 0;
+    this.loadUsers();
+  }
+
+  previousPage(): void {
+    if (this.currentPage > 0) {
+      this.onPageChange(this.currentPage - 1);
+    }
+  }
+
+  nextPage(): void {
+    if (this.currentPage < this.totalPages - 1) {
+      this.onPageChange(this.currentPage + 1);
+    }
   }
 
   logout(): void {
