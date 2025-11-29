@@ -1,0 +1,128 @@
+<div class="user-create-container">
+  <header class="header">
+    <div class="header-content">
+      <h1>Admin - Create User</h1>
+      <nav class="nav">
+        <a routerLink="/admin/businesses" routerLinkActive="active" class="nav-link">Businesses</a>
+        <a routerLink="/admin/deals" routerLinkActive="active" class="nav-link">Deals</a>
+        <a routerLink="/admin/coupons" routerLinkActive="active" class="nav-link">Coupons</a>
+        <a routerLink="/admin/users" routerLinkActive="active" class="nav-link">Users</a>
+        <button class="btn-logout" (click)="logout()">Logout</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <div class="form-container">
+      <h2>Create New User</h2>
+
+      @if (successMessage) {
+        <div class="success-message">{{ successMessage }}</div>
+      }
+
+      @if (errorMessage) {
+        <div class="error-message">{{ errorMessage }}</div>
+      }
+
+      <form (ngSubmit)="onSubmit()" #userForm="ngForm">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="username">Username *</label>
+            <input
+              type="text"
+              id="username"
+              name="username"
+              [(ngModel)]="user.username"
+              required
+              [disabled]="isSubmitting"
+              placeholder="e.g., john.doe"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="password">Password *</label>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              [(ngModel)]="user.password"
+              required
+              [disabled]="isSubmitting"
+              placeholder="Enter a secure password"
+            />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="role">Role *</label>
+            <select
+              id="role"
+              name="role"
+              [(ngModel)]="user.role"
+              (change)="onRoleChange()"
+              required
+              [disabled]="isSubmitting"
+            >
+              <option value="BUSINESS">BUSINESS</option>
+              <option value="ADMIN">ADMIN</option>
+            </select>
+          </div>
+
+          @if (user.role === 'BUSINESS') {
+            <div class="form-group">
+              <label for="businessId">Business *</label>
+              <select
+                id="businessId"
+                name="businessId"
+                [(ngModel)]="user.businessId"
+                required
+                [disabled]="isSubmitting || isLoadingBusinesses"
+              >
+                <option [ngValue]="undefined">-- Select a business --</option>
+                @for (business of businesses; track business.businessId) {
+                  <option [ngValue]="business.businessId">{{ business.businessName }}</option>
+                }
+              </select>
+            </div>
+          }
+        </div>
+
+        <div class="form-group">
+          <label class="checkbox-label">
+            <input
+              type="checkbox"
+              name="enabled"
+              [(ngModel)]="user.enabled"
+              [disabled]="isSubmitting"
+            />
+            <span>User Enabled</span>
+          </label>
+          <small class="help-text">Disabled users cannot log in to the system</small>
+        </div>
+
+        <div class="form-actions">
+          <button
+            type="button"
+            class="btn-secondary"
+            [disabled]="isSubmitting"
+            routerLink="/admin/users"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            class="btn-primary"
+            [disabled]="!userForm.form.valid || isSubmitting"
+          >
+            @if (isSubmitting) {
+              <span>Creating...</span>
+            } @else {
+              <span>Create User</span>
+            }
+          </button>
+        </div>
+      </form>
+    </div>
+  </main>
+</div>

@@ -46,6 +46,14 @@ export const routes: Routes = [
       {
         path: 'coupons',
         loadComponent: () => import('./features/admin/coupons/coupons.component').then(m => m.AdminCouponsComponent)
+      },
+      {
+        path: 'users',
+        loadComponent: () => import('./features/admin/user-list/user-list.component').then(m => m.UserListComponent)
+      },
+      {
+        path: 'users/create',
+        loadComponent: () => import('./features/admin/user-create/user-create.component').then(m => m.UserCreateComponent)
       }
     ]
   },

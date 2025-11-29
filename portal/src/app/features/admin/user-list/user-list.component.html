@@ -1,7 +1,7 @@
-<div class="deals-container">
+<div class="users-container">
   <header class="header">
     <div class="header-content">
-      <h1>Admin - Deals</h1>
+      <h1>Admin - Users</h1>
       <nav class="nav">
         <a routerLink="/admin/businesses" routerLinkActive="active" class="nav-link">Businesses</a>
         <a routerLink="/admin/deals" routerLinkActive="active" class="nav-link">Deals</a>
@@ -29,48 +29,52 @@
         </select>
       </div>
       @if (selectedBusinessId) {
-        <button class="btn-create" routerLink="/admin/deals/create">
-          + Create New Deal
+        <button class="btn-create" routerLink="/admin/users/create">
+          + Create New User
         </button>
       }
     </div>
 
-    @if (isLoadingDeals) {
-      <div class="loading">Loading deals...</div>
+    @if (isLoadingUsers) {
+      <div class="loading">Loading users...</div>
     }
 
     @if (errorMessage) {
       <div class="error-message">{{ errorMessage }}</div>
     }
 
-    @if (!isLoadingDeals && selectedBusinessId && deals.length === 0) {
-      <div class="no-data">No deals found for this business</div>
+    @if (!isLoadingUsers && selectedBusinessId && users.length === 0) {
+      <div class="no-data">No users found for this business</div>
     }
 
-    @if (!isLoadingDeals && deals.length > 0) {
+    @if (!isLoadingUsers && users.length > 0) {
       <div class="table-container">
-        <table class="deals-table">
+        <table class="users-table">
           <thead>
             <tr>
               <th>ID</th>
-              <th>Code</th>
-              <th>Title</th>
+              <th>Username</th>
+              <th>Role</th>
               <th>Business</th>
-              <th>Expiry Date</th>
-              <th>Lifetime (Days)</th>
-              <th>Commission %</th>
+              <th>Status</th>
             </tr>
           </thead>
           <tbody>
-            @for (deal of deals; track deal.dealId) {
+            @for (user of users; track user.userId) {
               <tr>
-                <td>{{ deal.dealId }}</td>
-                <td class="deal-code">{{ deal.code }}</td>
-                <td class="deal-title">{{ deal.title }}</td>
-                <td>{{ deal.business.businessName }}</td>
-                <td>{{ deal.expiryDate ? (deal.expiryDate | date:'short') : '-' }}</td>
-                <td>{{ deal.lifetimeDays ?? '-' }}</td>
-                <td>{{ deal.commissionPercentage ? (deal.commissionPercentage + '%') : '-' }}</td>
+                <td>{{ user.userId }}</td>
+                <td class="username">{{ user.username }}</td>
+                <td>
+                  <span class="role-badge" [class.role-admin]="user.role === 'ADMIN'" [class.role-business]="user.role === 'BUSINESS'">
+                    {{ user.role }}
+                  </span>
+                </td>
+                <td>{{ user.business?.businessName || '-' }}</td>
+                <td>
+                  <span class="status-badge" [class.status-enabled]="user.enabled" [class.status-disabled]="!user.enabled">
+                    {{ user.enabled ? 'Enabled' : 'Disabled' }}
+                  </span>
+                </td>
               </tr>
             }
           </tbody>

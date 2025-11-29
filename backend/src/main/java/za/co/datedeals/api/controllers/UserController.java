@@ -38,6 +38,17 @@ public class UserController {
         }
     }
 
+    @GetMapping("/business/{businessId}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<User>> getUsersByBusinessId(@PathVariable Long businessId) {
+        try {
+            List<User> users = userService.getUsersByBusinessId(businessId);
+            return ResponseEntity.ok(users);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<User> getUserById(@PathVariable Long id) {

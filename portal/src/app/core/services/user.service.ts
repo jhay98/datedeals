@@ -2,18 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
-
-export interface User {
-  userId?: number;
-  username: string;
-  password?: string;
-  role: 'ADMIN' | 'BUSINESS';
-  business?: {
-    businessId: number;
-    businessName: string;
-  };
-  enabled: boolean;
-}
+import { User, UserRequest } from '../models/user.model';
 
 @Injectable({
   providedIn: 'root'
@@ -27,13 +16,19 @@ export class UserService {
     );
   }
 
+  getUsersByBusinessId(businessId: number): Observable<User[]> {
+    return this.http.get<User[]>(
+      `${environment.apiUrl}/user/business/${businessId}`
+    );
+  }
+
   getUserById(id: number): Observable<User> {
     return this.http.get<User>(
       `${environment.apiUrl}/user/${id}`
     );
   }
 
-  createUser(user: Omit<User, 'userId'>): Observable<User> {
+  createUser(user: UserRequest): Observable<User> {
     return this.http.post<User>(
       `${environment.apiUrl}/user`,
       user
