@@ -98,6 +98,33 @@ public class AuthorizationService {
         return false;
     }
 
+    public boolean canAccessCouponByCode(String couponCode) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return false;
+        }
+
+        String username = authentication.getName();
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // Admin can access any coupon
+        if (user.getRole() == User.UserRole.ADMIN) {
+            return true;
+        }
+
+        // Business user can only access coupons for their business
+        if (user.getRole() == User.UserRole.BUSINESS && user.getBusiness() != null) {
+            Coupon coupon = couponRepository.findByCouponCode(couponCode)
+                    .orElseThrow(() -> new RuntimeException("Coupon not found"));
+            return coupon.getDeal() != null && 
+                   coupon.getDeal().getBusiness() != null && 
+                   coupon.getDeal().getBusiness().getBusinessId().equals(user.getBusiness().getBusinessId());
+        }
+
+        return false;
+    }
+
     public User getCurrentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {

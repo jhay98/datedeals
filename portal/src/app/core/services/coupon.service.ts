@@ -42,4 +42,17 @@ export class CouponService {
       {}
     );
   }
+
+  getCouponByCode(couponCode: string): Observable<Coupon> {
+    return this.http.get<Coupon>(
+      `${environment.apiUrl}/coupon/code/${couponCode}`
+    );
+  }
+
+  redeemCouponByCode(couponCode: string): Observable<Coupon> {
+    return this.http.post<Coupon>(
+      `${environment.apiUrl}/coupon/code/${couponCode}/redeem`,
+      {}
+    );
+  }
 }

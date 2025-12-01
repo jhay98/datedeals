@@ -12,6 +12,10 @@ export const routes: Routes = [
     loadComponent: () => import('./features/auth/login/login.component').then(m => m.LoginComponent)
   },
   {
+    path: 'redeem/:couponCode',
+    loadComponent: () => import('./features/auth/redeem/redeem.component').then(m => m.RedeemComponent)
+  },
+  {
     path: 'business',
     canActivate: [authGuard],
     data: { role: 'BUSINESS' },

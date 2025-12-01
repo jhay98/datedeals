@@ -1,7 +1,7 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { LoginRequest } from '../../../core/models/login.model';
 
@@ -12,9 +12,10 @@ import { LoginRequest } from '../../../core/models/login.model';
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss']
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
   private authService = inject(AuthService);
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
 
   credentials: LoginRequest = {
     username: '',
@@ -23,6 +24,15 @@ export class LoginComponent {
 
   errorMessage = '';
   isLoading = false;
+  returnUrl: string | null = null;
+  returnMessage = '';
+
+  ngOnInit(): void {
+    this.returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
+    if (this.returnUrl) {
+      this.returnMessage = 'Please log in to continue';
+    }
+  }
 
   onSubmit(): void {
     if (!this.credentials.username || !this.credentials.password) {
@@ -36,11 +46,17 @@ export class LoginComponent {
     this.authService.login(this.credentials).subscribe({
       next: (response) => {
         this.isLoading = false;
-        // Redirect based on role
-        if (response.role === 'ADMIN') {
-          this.router.navigate(['/admin/businesses']);
+        
+        // Redirect to returnUrl if it exists
+        if (this.returnUrl) {
+          this.router.navigateByUrl(this.returnUrl);
         } else {
-          this.router.navigate(['/business/coupons']);
+          // Redirect based on role
+          if (response.role === 'ADMIN') {
+            this.router.navigate(['/admin/businesses']);
+          } else {
+            this.router.navigate(['/business/coupons']);
+          }
         }
       },
       error: (error) => {

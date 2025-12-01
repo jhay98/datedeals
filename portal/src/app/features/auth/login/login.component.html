@@ -3,6 +3,12 @@
     <h1>DateDeals Portal</h1>
     <h2>Login</h2>
     
+    @if (returnMessage) {
+      <div class="info-message">
+        {{ returnMessage }}
+      </div>
+    }
+    
     <form (ngSubmit)="onSubmit()" #loginForm="ngForm">
       <div class="form-group">
         <label for="username">Username</label>

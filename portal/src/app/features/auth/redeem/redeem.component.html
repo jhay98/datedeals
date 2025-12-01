@@ -1,0 +1,103 @@
+<div class="redeem-container">
+  <div class="redeem-card">
+    <h1>DateDeals</h1>
+    <h2>Redeem Coupon</h2>
+    
+    @if (isLoading) {
+      <div class="loading-message">
+        <span>Loading coupon details...</span>
+      </div>
+    } @else if (coupon && !successMessage) {
+      <div class="coupon-details">
+        <div class="detail-row">
+          <span class="label">Coupon Code:</span>
+          <span class="value">{{ coupon.couponCode }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Deal:</span>
+          <span class="value">{{ coupon.dealTitle }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Business:</span>
+          <span class="value">{{ coupon.businessName }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Value:</span>
+          <span class="value">R{{ coupon.valuePrice?.toFixed(2) }}</span>
+        </div>
+        @if (coupon.expireDate) {
+          <div class="detail-row">
+            <span class="label">Expires:</span>
+            <span class="value">{{ coupon.expireDate | date:'dd MMM yyyy' }}</span>
+          </div>
+        }
+      </div>
+
+      @if (errorMessage) {
+        <div class="error-message">
+          {{ errorMessage }}
+        </div>
+      }
+
+      @if (!coupon.redeemed && !errorMessage) {
+        <div class="confirmation-text">
+          Are you sure you want to redeem this coupon?
+        </div>
+
+        <div class="button-group">
+          <button
+            type="button"
+            (click)="onConfirmRedeem()"
+            [disabled]="isRedeeming"
+            class="btn-primary"
+          >
+            @if (isRedeeming) {
+              <span>Redeeming...</span>
+            } @else {
+              <span>Confirm Redeem</span>
+            }
+          </button>
+          
+          <button
+            type="button"
+            (click)="onCancel()"
+            [disabled]="isRedeeming"
+            class="btn-secondary"
+          >
+            Cancel
+          </button>
+        </div>
+      }
+    } @else if (successMessage) {
+      <div class="success-message">
+        <div class="success-icon">✓</div>
+        <p>{{ successMessage }}</p>
+        @if (coupon?.redeemDate) {
+          <p class="redeem-date">Redeemed on: {{ coupon.redeemDate | date:'dd MMM yyyy HH:mm' }}</p>
+        }
+      </div>
+      
+      <button
+        type="button"
+        (click)="onCancel()"
+        class="btn-secondary"
+      >
+        Close
+      </button>
+    }
+
+    @if (errorMessage && !coupon) {
+      <div class="error-message">
+        {{ errorMessage }}
+      </div>
+      
+      <button
+        type="button"
+        (click)="onCancel()"
+        class="btn-secondary"
+      >
+        Back
+      </button>
+    }
+  </div>
+</div>

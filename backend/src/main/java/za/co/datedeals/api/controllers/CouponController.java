@@ -98,4 +98,32 @@ public class CouponController {
             return ResponseEntity.badRequest().build();
         }
     }
+
+    @GetMapping("/code/{couponCode}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'BUSINESS')")
+    public ResponseEntity<CouponResponseDto> getCouponByCode(@PathVariable String couponCode) {
+        try {
+            if (!authorizationService.canAccessCouponByCode(couponCode)) {
+                return ResponseEntity.status(403).build();
+            }
+            CouponResponseDto coupon = couponService.getCouponByCode(couponCode);
+            return ResponseEntity.ok(coupon);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(404).build();
+        }
+    }
+
+    @PostMapping("/code/{couponCode}/redeem")
+    @PreAuthorize("hasAnyRole('ADMIN', 'BUSINESS')")
+    public ResponseEntity<CouponResponseDto> redeemCouponByCode(@PathVariable String couponCode) {
+        try {
+            if (!authorizationService.canAccessCouponByCode(couponCode)) {
+                return ResponseEntity.status(403).build();
+            }
+            CouponResponseDto coupon = couponService.redeemCouponByCode(couponCode);
+            return ResponseEntity.ok(coupon);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
 }

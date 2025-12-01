@@ -7,13 +7,23 @@ import za.co.datedeals.api.entities.coupon.Coupon;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.time.format.DateTimeFormatter;
+import java.util.Base64;
 
 @Service
 public class CouponPdfService {
 
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd MMM yyyy");
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("dd MMM yyyy HH:mm");
+    private static final int QR_CODE_SIZE = 200;
+    
+    private final QrCodeService qrCodeService;
+    
+    public CouponPdfService(QrCodeService qrCodeService) {
+        this.qrCodeService = qrCodeService;
+    }
 
     /**
      * Generates a PDF from a coupon's HTML template
@@ -44,21 +54,33 @@ public class CouponPdfService {
      */
     private String processHtmlTemplate(Coupon coupon) {
         String html = coupon.getDeal().getHtmlVoucherTemplate();
+        return processHtmlTemplate(coupon, html);
+    }
+
+    /**
+     * Processes the provided HTML template by replacing placeholders with actual coupon data
+     * 
+     * @param coupon The coupon containing data to replace in the template
+     * @param html The HTML template to process
+     * @return Processed HTML string with placeholders replaced
+     */
+    private String processHtmlTemplate(Coupon coupon, String html) {
 
         // Replace common placeholders
         html = html.replace("{{couponCode}}", coupon.getCouponCode() != null ? coupon.getCouponCode() : "");
-        html = html.replace("{{dealTitle}}", coupon.getDeal().getTitle() != null ? coupon.getDeal().getTitle() : "");
+        html = html.replace("{{dealTitle}}", 
+                coupon.getDeal() != null && coupon.getDeal().getTitle() != null ? coupon.getDeal().getTitle() : "");
         html = html.replace("{{businessName}}", 
-                coupon.getDeal().getBusiness() != null && coupon.getDeal().getBusiness().getBusinessName() != null 
+                coupon.getDeal() != null && coupon.getDeal().getBusiness() != null && coupon.getDeal().getBusiness().getBusinessName() != null 
                 ? coupon.getDeal().getBusiness().getBusinessName() : "");
         html = html.replace("{{businessAddress}}", 
-                coupon.getDeal().getBusiness() != null && coupon.getDeal().getBusiness().getAddress() != null 
+                coupon.getDeal() != null && coupon.getDeal().getBusiness() != null && coupon.getDeal().getBusiness().getAddress() != null 
                 ? coupon.getDeal().getBusiness().getAddress() : "");
         html = html.replace("{{businessEmail}}", 
-                coupon.getDeal().getBusiness() != null && coupon.getDeal().getBusiness().getContactEmail() != null 
+                coupon.getDeal() != null && coupon.getDeal().getBusiness() != null && coupon.getDeal().getBusiness().getContactEmail() != null 
                 ? coupon.getDeal().getBusiness().getContactEmail() : "");
         html = html.replace("{{businessPhone}}", 
-                coupon.getDeal().getBusiness() != null && coupon.getDeal().getBusiness().getContactPhone() != null 
+                coupon.getDeal() != null && coupon.getDeal().getBusiness() != null && coupon.getDeal().getBusiness().getContactPhone() != null 
                 ? coupon.getDeal().getBusiness().getContactPhone() : "");
         
         // Format prices
@@ -78,6 +100,10 @@ public class CouponPdfService {
         // Redeem status
         html = html.replace("{{redeemed}}", 
                 coupon.getRedeemed() != null && coupon.getRedeemed() ? "REDEEMED" : "ACTIVE");
+        
+        // Generate QR code with redeem link
+        String redeemUrl = "https://admin.datedeals.co.za/redeem/" + coupon.getCouponCode();
+        html = html.replace("{{qrCode}}", generateQrCodeDataUrl(redeemUrl));
 
         // Ensure proper HTML structure
         if (!html.trim().startsWith("<!DOCTYPE") && !html.trim().startsWith("<html")) {
@@ -156,149 +182,49 @@ public class CouponPdfService {
         }
 
         String htmlTemplate = createDefaultHtmlTemplate();
-        
-        // Create a temporary coupon-like object with the default template
-        // to leverage the processHtmlTemplate method
-        String originalTemplate = coupon.getDeal().getHtmlVoucherTemplate();
-        coupon.getDeal().setHtmlVoucherTemplate(htmlTemplate);
-        String processedHtml = processHtmlTemplate(coupon);
-        coupon.getDeal().setHtmlVoucherTemplate(originalTemplate);
+        String processedHtml = processHtmlTemplate(coupon, htmlTemplate);
         
         return generatePdfFromHtml(processedHtml);
     }
 
     /**
      * Creates a default HTML template for coupons without custom templates
-     * Uses placeholders that will be processed by processHtmlTemplate
+     * Loads the template from the resources folder
      * 
      * @return Default HTML template string with placeholders
+     * @throws IOException if the template file cannot be read
      */
-    private String createDefaultHtmlTemplate() {
-        return """
-                <!DOCTYPE html>
-                <html>
-                <head>
-                    <meta charset="UTF-8"/>
-                    <style>
-                        body {
-                            font-family: Arial, sans-serif;
-                            margin: 0;
-                            padding: 20px;
-                            background-color: #f5f5f5;
-                        }
-                        .coupon {
-                            background: white;
-                            border: 3px dashed #333;
-                            border-radius: 10px;
-                            padding: 30px;
-                            max-width: 600px;
-                            margin: 0 auto;
-                            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-                        }
-                        .header {
-                            text-align: center;
-                            border-bottom: 2px solid #333;
-                            padding-bottom: 20px;
-                            margin-bottom: 20px;
-                        }
-                        .business-name {
-                            font-size: 28px;
-                            font-weight: bold;
-                            color: #333;
-                            margin-bottom: 10px;
-                        }
-                        .deal-title {
-                            font-size: 20px;
-                            color: #666;
-                        }
-                        .coupon-code {
-                            text-align: center;
-                            font-size: 36px;
-                            font-weight: bold;
-                            letter-spacing: 4px;
-                            background: #f0f0f0;
-                            padding: 20px;
-                            border-radius: 5px;
-                            margin: 20px 0;
-                        }
-                        .details {
-                            margin: 20px 0;
-                        }
-                        .detail-row {
-                            display: flex;
-                            justify-content: space-between;
-                            padding: 10px 0;
-                            border-bottom: 1px solid #eee;
-                        }
-                        .label {
-                            font-weight: bold;
-                            color: #666;
-                        }
-                        .value {
-                            color: #333;
-                        }
-                        .status {
-                            text-align: center;
-                            font-size: 24px;
-                            font-weight: bold;
-                            padding: 15px;
-                            margin-top: 20px;
-                            border-radius: 5px;
-                        }
-                        .status.active {
-                            background: #4CAF50;
-                            color: white;
-                        }
-                        .status.redeemed {
-                            background: #f44336;
-                            color: white;
-                        }
-                    </style>
-                </head>
-                <body>
-                    <div class="coupon">
-                        <div class="header">
-                            <div class="business-name">{{businessName}}</div>
-                            <div class="deal-title">{{dealTitle}}</div>
-                        </div>
-                        
-                        <div class="coupon-code">{{couponCode}}</div>
-                        
-                        <div class="details">
-                            <div class="detail-row">
-                                <span class="label">Purchase Price:</span>
-                                <span class="value">{{purchasePrice}}</span>
-                            </div>
-                            <div class="detail-row">
-                                <span class="label">Value:</span>
-                                <span class="value">{{valuePrice}}</span>
-                            </div>
-                            <div class="detail-row">
-                                <span class="label">Issue Date:</span>
-                                <span class="value">{{issueDate}}</span>
-                            </div>
-                            <div class="detail-row">
-                                <span class="label">Expiry Date:</span>
-                                <span class="value">{{expireDate}}</span>
-                            </div>
-                            <div class="detail-row">
-                                <span class="label">Address:</span>
-                                <span class="value">{{businessAddress}}</span>
-                            </div>
-                            <div class="detail-row">
-                                <span class="label">Email:</span>
-                                <span class="value">{{businessEmail}}</span>
-                            </div>
-                            <div class="detail-row">
-                                <span class="label">Phone:</span>
-                                <span class="value">{{businessPhone}}</span>
-                            </div>
-                        </div>
-                        
-                        <div class="status {{redeemed}}">{{redeemed}}</div>
-                    </div>
-                </body>
-                </html>
-                """;
+    private String createDefaultHtmlTemplate() throws IOException {
+        try (InputStream inputStream = getClass().getClassLoader()
+                .getResourceAsStream("templates/coupon-default.html")) {
+            
+            if (inputStream == null) {
+                throw new IOException("Template file not found: templates/coupon-default.html");
+            }
+            
+            return new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
+        }
+    }
+    
+    /**
+     * Generates a QR code and returns it as a base64 data URL for embedding in HTML
+     * 
+     * @param text The text to encode in the QR code
+     * @return Base64 data URL string for the QR code image
+     */
+    private String generateQrCodeDataUrl(String text) {
+        try {
+            if (text == null || text.isEmpty()) {
+                return "";
+            }
+            
+            byte[] qrCodeBytes = qrCodeService.generateQRCode(text, QR_CODE_SIZE, QR_CODE_SIZE);
+            String base64Image = Base64.getEncoder().encodeToString(qrCodeBytes);
+            return "data:image/png;base64," + base64Image;
+        } catch (Exception e) {
+            // Log error and return empty string to avoid breaking PDF generation
+            System.err.println("Failed to generate QR code: " + e.getMessage());
+            return "";
+        }
     }
 }
