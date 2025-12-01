@@ -59,6 +59,31 @@ public class CouponService {
                 .orElseThrow(() -> new RuntimeException("Coupon not found"));
     }
 
+    public CouponResponseDto getCouponByCode(String couponCode) {
+        Coupon coupon = couponRepository.findByCouponCode(couponCode)
+                .orElseThrow(() -> new RuntimeException("Coupon not found"));
+        return convertToDto(coupon);
+    }
+
+    public CouponResponseDto redeemCouponByCode(String couponCode) {
+        Coupon coupon = couponRepository.findByCouponCode(couponCode)
+                .orElseThrow(() -> new RuntimeException("Coupon not found"));
+
+        if (coupon.getRedeemed()) {
+            throw new RuntimeException("Coupon has already been redeemed");
+        }
+
+        if (coupon.getExpireDate() != null && coupon.getExpireDate().isBefore(LocalDateTime.now())) {
+            throw new RuntimeException("Coupon has expired");
+        }
+
+        coupon.setRedeemed(true);
+        coupon.setRedeemDate(LocalDateTime.now());
+        coupon = couponRepository.save(coupon);
+
+        return convertToDto(coupon);
+    }
+
     private CouponResponseDto convertToDto(Coupon coupon) {
         return new CouponResponseDto(
                 coupon.getCouponId(),
