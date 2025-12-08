@@ -9,6 +9,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
+import za.co.datedeals.api.dtos.UserRequestDto;
 import za.co.datedeals.api.entities.user.User;
 import za.co.datedeals.api.security.JwtAuthenticationFilter;
 import za.co.datedeals.api.security.JwtTokenProvider;
@@ -59,13 +60,19 @@ class UserControllerTest {
     @WithMockUser(roles = "ADMIN")
     void createUser_WithAdminRole_ReturnsOk() throws Exception {
         // Arrange
-        when(userService.createUser(any(User.class))).thenReturn(testUser);
+        UserRequestDto userRequest = new UserRequestDto();
+        userRequest.setUsername(testUser.getUsername());
+        userRequest.setPassword("password");
+        userRequest.setRole(testUser.getRole());
+        userRequest.setEnabled(testUser.getEnabled());
+        
+        when(userService.createUser(any(UserRequestDto.class))).thenReturn(testUser);
 
         // Act & Assert
         mockMvc.perform(post("/user")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(testUser)))
+                        .content(objectMapper.writeValueAsString(userRequest)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.userId").value(testUser.getUserId()))
                 .andExpect(jsonPath("$.username").value(testUser.getUsername()));
@@ -77,14 +84,19 @@ class UserControllerTest {
     @WithMockUser(roles = "ADMIN")
     void createUser_WithDuplicateUsername_ReturnsBadRequest() throws Exception {
         // Arrange
-        when(userService.createUser(any(User.class)))
+        UserRequestDto userRequest = new UserRequestDto();
+        userRequest.setUsername(testUser.getUsername());
+        userRequest.setPassword("password");
+        userRequest.setRole(testUser.getRole());
+        
+        when(userService.createUser(any(UserRequestDto.class)))
                 .thenThrow(new RuntimeException("Username already exists"));
 
         // Act & Assert
         mockMvc.perform(post("/user")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(testUser)))
+                        .content(objectMapper.writeValueAsString(userRequest)))
                 .andExpect(status().isBadRequest());
     }
 
