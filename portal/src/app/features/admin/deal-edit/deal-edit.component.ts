@@ -1,7 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterModule, Router } from '@angular/router';
+import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { DealService } from '../../../core/services/deal.service';
 import { BusinessService } from '../../../core/services/business.service';
 import { AuthService } from '../../../core/services/auth.service';
@@ -9,19 +9,22 @@ import { DealRequest } from '../../../core/models/deal.model';
 import { Business } from '../../../core/models/business.model';
 
 @Component({
-  selector: 'app-deal-create',
+  selector: 'app-deal-edit',
   standalone: true,
   imports: [CommonModule, FormsModule, RouterModule],
-  templateUrl: './deal-create.component.html',
-  styleUrls: ['./deal-create.component.scss']
+  templateUrl: './deal-edit.component.html',
+  styleUrls: ['./deal-edit.component.scss']
 })
-export class DealCreateComponent implements OnInit {
+export class DealEditComponent implements OnInit {
   private dealService = inject(DealService);
   private businessService = inject(BusinessService);
   private authService = inject(AuthService);
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
 
+  dealId: number = 0;
   businesses: Business[] = [];
+  isLoading = true;
   isLoadingBusinesses = false;
   isSubmitting = false;
   errorMessage = '';
@@ -61,13 +64,9 @@ export class DealCreateComponent implements OnInit {
 </div>`;
 
   ngOnInit(): void {
+    this.dealId = Number(this.route.snapshot.paramMap.get('id'));
     this.loadBusinesses();
-  }
-
-  onExpiryTypeChange(): void {
-    // Clear both fields when switching types
-    this.deal.expiryDate = null;
-    this.deal.lifetimeDays = null;
+    this.loadDeal();
   }
 
   loadBusinesses(): void {
@@ -83,6 +82,42 @@ export class DealCreateComponent implements OnInit {
         console.error('Error loading businesses:', error);
       }
     });
+  }
+
+  loadDeal(): void {
+    this.dealService.getDealById(this.dealId).subscribe({
+      next: (data) => {
+        this.deal = {
+          code: data.code,
+          title: data.title,
+          htmlVoucherTemplate: data.htmlVoucherTemplate,
+          expiryDate: data.expiryDate,
+          lifetimeDays: data.lifetimeDays,
+          commissionPercentage: data.commissionPercentage,
+          businessId: data.business.businessId
+        };
+        // Set expiryType based on existing data
+        if (data.expiryDate) {
+          this.expiryType = 'date';
+        } else if (data.lifetimeDays) {
+          this.expiryType = 'lifetime';
+        } else {
+          this.expiryType = 'none';
+        }
+        this.isLoading = false;
+      },
+      error: (error) => {
+        this.errorMessage = 'Failed to load deal details';
+        this.isLoading = false;
+        console.error('Error loading deal:', error);
+      }
+    });
+  }
+
+  onExpiryTypeChange(): void {
+    // Clear both fields when switching types
+    this.deal.expiryDate = null;
+    this.deal.lifetimeDays = null;
   }
 
   onSubmit(): void {
@@ -105,21 +140,10 @@ export class DealCreateComponent implements OnInit {
       htmlVoucherTemplate: this.deal.htmlVoucherTemplate || null
     };
 
-    this.dealService.createDeal(dealToSubmit).subscribe({
+    this.dealService.updateDeal(this.dealId, dealToSubmit).subscribe({
       next: (response) => {
         this.isSubmitting = false;
-        this.successMessage = 'Deal created successfully!';
-        // Reset form
-        this.expiryType = 'none';
-        this.deal = {
-          code: '',
-          title: '',
-          htmlVoucherTemplate: null,
-          expiryDate: null,
-          lifetimeDays: null,
-          commissionPercentage: null,
-          businessId: 0
-        };
+        this.successMessage = 'Deal updated successfully!';
         // Navigate to deals list after 2 seconds
         setTimeout(() => {
           this.router.navigate(['/admin/deals']);
@@ -127,28 +151,13 @@ export class DealCreateComponent implements OnInit {
       },
       error: (error) => {
         this.isSubmitting = false;
-        this.errorMessage = error.error?.message || 'Failed to create deal';
-        console.error('Error creating deal:', error);
+        this.errorMessage = error.error?.message || 'Failed to update deal';
+        console.error('Error updating deal:', error);
       }
     });
   }
 
   logout(): void {
     this.authService.logout();
-  }
-
-  // Generate a random SKU and assign it to the deal code
-  onGenerateSku(): void {
-    if (this.isSubmitting) return;
-    this.deal.code = this.generateRandomSku();
-  }
-
-  private generateRandomSku(length = 8): string {
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-    let sku = '';
-    for (let i = 0; i < length; i++) {
-      sku += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    return `DEAL-${sku}`;
   }
 }

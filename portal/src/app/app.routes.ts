@@ -13,6 +13,7 @@ export const routes: Routes = [
   },
   {
     path: 'redeem/:couponCode',
+    canActivate: [authGuard],
     loadComponent: () => import('./features/auth/redeem/redeem.component').then(m => m.RedeemComponent)
   },
   {
@@ -40,12 +41,20 @@ export const routes: Routes = [
         loadComponent: () => import('./features/admin/business-create/business-create.component').then(m => m.BusinessCreateComponent)
       },
       {
+        path: 'businesses/edit/:id',
+        loadComponent: () => import('./features/admin/business-edit/business-edit.component').then(m => m.BusinessEditComponent)
+      },
+      {
         path: 'deals',
         loadComponent: () => import('./features/admin/deal-list/deal-list.component').then(m => m.DealListComponent)
       },
       {
         path: 'deals/create',
         loadComponent: () => import('./features/admin/deal-create/deal-create.component').then(m => m.DealCreateComponent)
+      },
+      {
+        path: 'deals/edit/:id',
+        loadComponent: () => import('./features/admin/deal-edit/deal-edit.component').then(m => m.DealEditComponent)
       },
       {
         path: 'coupons',
@@ -58,6 +67,10 @@ export const routes: Routes = [
       {
         path: 'users/create',
         loadComponent: () => import('./features/admin/user-create/user-create.component').then(m => m.UserCreateComponent)
+      },
+      {
+        path: 'users/edit/:id',
+        loadComponent: () => import('./features/admin/user-edit/user-edit.component').then(m => m.UserEditComponent)
       }
     ]
   },
