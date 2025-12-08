@@ -5,6 +5,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import za.co.datedeals.api.dtos.UserRequestDto;
+import za.co.datedeals.api.entities.business.Business;
+import za.co.datedeals.api.entities.business.BusinessRepository;
 import za.co.datedeals.api.entities.user.User;
 import za.co.datedeals.api.entities.user.UserRepository;
 
@@ -18,13 +21,29 @@ public class UserService {
     private UserRepository userRepository;
 
     @Autowired
+    private BusinessRepository businessRepository;
+
+    @Autowired
     private PasswordEncoder passwordEncoder;
 
-    public User createUser(User user) {
-        if (userRepository.existsByUsername(user.getUsername())) {
+    public User createUser(UserRequestDto userRequest) {
+        if (userRepository.existsByUsername(userRequest.getUsername())) {
             throw new RuntimeException("Username already exists");
         }
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        
+        User user = new User();
+        user.setUsername(userRequest.getUsername());
+        user.setPassword(passwordEncoder.encode(userRequest.getPassword()));
+        user.setRole(userRequest.getRole());
+        user.setEnabled(userRequest.getEnabled());
+        
+        // Set business if businessId is provided
+        if (userRequest.getBusinessId() != null) {
+            Business business = businessRepository.findById(userRequest.getBusinessId())
+                    .orElseThrow(() -> new RuntimeException("Business not found with id: " + userRequest.getBusinessId()));
+            user.setBusiness(business);
+        }
+        
         return userRepository.save(user);
     }
 

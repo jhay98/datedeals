@@ -136,12 +136,9 @@ public class DealController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'BUSINESS')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteDeal(@PathVariable Long id) {
         try {
-            if (!authorizationService.canAccessDeal(id)) {
-                return ResponseEntity.status(403).build();
-            }
             dealService.deleteDeal(id);
             return ResponseEntity.ok().build();
         } catch (Exception e) {

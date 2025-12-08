@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import za.co.datedeals.api.dtos.PageResponse;
+import za.co.datedeals.api.dtos.UserRequestDto;
 import za.co.datedeals.api.entities.user.User;
 import za.co.datedeals.api.services.UserService;
 
@@ -23,9 +24,9 @@ public class UserController {
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<User> createUser(@RequestBody User user) {
+    public ResponseEntity<User> createUser(@RequestBody UserRequestDto userRequest) {
         try {
-            User createdUser = userService.createUser(user);
+            User createdUser = userService.createUser(userRequest);
             return ResponseEntity.ok(createdUser);
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().build();

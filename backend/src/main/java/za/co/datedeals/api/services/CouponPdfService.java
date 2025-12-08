@@ -94,12 +94,6 @@ public class CouponPdfService {
                 coupon.getIssueDate() != null ? coupon.getIssueDate().format(DATE_FORMATTER) : "");
         html = html.replace("{{expireDate}}", 
                 coupon.getExpireDate() != null ? coupon.getExpireDate().format(DATE_FORMATTER) : "");
-        html = html.replace("{{redeemDate}}", 
-                coupon.getRedeemDate() != null ? coupon.getRedeemDate().format(DATE_TIME_FORMATTER) : "");
-        
-        // Redeem status
-        html = html.replace("{{redeemed}}", 
-                coupon.getRedeemed() != null && coupon.getRedeemed() ? "REDEEMED" : "ACTIVE");
         
         // Generate QR code with redeem link
         String redeemUrl = "https://admin.datedeals.co.za/redeem/" + coupon.getCouponCode();

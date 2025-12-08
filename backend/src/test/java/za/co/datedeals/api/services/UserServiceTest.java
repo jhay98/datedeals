@@ -7,7 +7,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import za.co.datedeals.api.dtos.UserRequestDto;
 import za.co.datedeals.api.entities.business.Business;
+import za.co.datedeals.api.entities.business.BusinessRepository;
 import za.co.datedeals.api.entities.user.User;
 import za.co.datedeals.api.entities.user.UserRepository;
 import za.co.datedeals.api.utils.TestDataBuilder;
@@ -29,6 +31,9 @@ class UserServiceTest {
     private UserRepository userRepository;
 
     @Mock
+    private BusinessRepository businessRepository;
+
+    @Mock
     private PasswordEncoder passwordEncoder;
 
     @InjectMocks
@@ -46,36 +51,48 @@ class UserServiceTest {
     @Test
     void createUser_WithValidData_ReturnsCreatedUser() {
         // Arrange
+        UserRequestDto userRequest = new UserRequestDto();
+        userRequest.setUsername("newuser");
+        userRequest.setPassword("rawPassword");
+        userRequest.setRole(User.UserRole.BUSINESS);
+        userRequest.setBusinessId(1L);
+        userRequest.setEnabled(true);
+
         User newUser = new User();
         newUser.setUsername("newuser");
-        newUser.setPassword("rawPassword");
+        newUser.setPassword("encodedPassword");
         newUser.setRole(User.UserRole.BUSINESS);
+        newUser.setBusiness(testBusiness);
 
         when(userRepository.existsByUsername("newuser")).thenReturn(false);
         when(passwordEncoder.encode("rawPassword")).thenReturn("encodedPassword");
+        when(businessRepository.findById(1L)).thenReturn(Optional.of(testBusiness));
         when(userRepository.save(any(User.class))).thenReturn(newUser);
 
         // Act
-        User result = userService.createUser(newUser);
+        User result = userService.createUser(userRequest);
 
         // Assert
         assertThat(result).isNotNull();
         assertThat(result.getUsername()).isEqualTo("newuser");
         verify(userRepository).existsByUsername("newuser");
         verify(passwordEncoder).encode("rawPassword");
-        verify(userRepository).save(newUser);
+        verify(businessRepository).findById(1L);
+        verify(userRepository).save(any(User.class));
     }
 
     @Test
     void createUser_WithDuplicateUsername_ThrowsException() {
         // Arrange
-        User newUser = new User();
-        newUser.setUsername("existinguser");
+        UserRequestDto userRequest = new UserRequestDto();
+        userRequest.setUsername("existinguser");
+        userRequest.setPassword("password");
+        userRequest.setRole(User.UserRole.BUSINESS);
 
         when(userRepository.existsByUsername("existinguser")).thenReturn(true);
 
         // Act & Assert
-        assertThatThrownBy(() -> userService.createUser(newUser))
+        assertThatThrownBy(() -> userService.createUser(userRequest))
                 .isInstanceOf(RuntimeException.class)
                 .hasMessage("Username already exists");
 
