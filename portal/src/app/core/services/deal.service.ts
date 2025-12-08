@@ -48,4 +48,23 @@ export class DealService {
       { params }
     );
   }
+
+  getDealById(id: number): Observable<Deal> {
+    return this.http.get<Deal>(
+      `${environment.apiUrl}/deal/${id}`
+    );
+  }
+
+  updateDeal(id: number, deal: DealRequest): Observable<Deal> {
+    return this.http.put<Deal>(
+      `${environment.apiUrl}/deal/${id}`,
+      deal
+    );
+  }
+
+  deleteDeal(id: number): Observable<void> {
+    return this.http.delete<void>(
+      `${environment.apiUrl}/deal/${id}`
+    );
+  }
 }

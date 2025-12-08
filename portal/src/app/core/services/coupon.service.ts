@@ -37,7 +37,7 @@ export class CouponService {
   }
 
   redeemCoupon(couponId: number): Observable<Coupon> {
-    return this.http.put<Coupon>(
+    return this.http.post<Coupon>(
       `${environment.apiUrl}/coupon/${couponId}/redeem`,
       {}
     );

@@ -55,6 +55,25 @@
 
         <div class="form-row">
           <div class="form-group">
+            <label for="confirmPassword">Confirm Password *</label>
+            <input
+              type="password"
+              id="confirmPassword"
+              name="confirmPassword"
+              [(ngModel)]="confirmPassword"
+              required
+              [disabled]="isSubmitting"
+              placeholder="Re-enter your password"
+            />
+            @if (confirmPassword && user.password !== confirmPassword) {
+              <small class="error-text">Passwords do not match</small>
+            }
+          </div>
+          <div class="form-group"></div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
             <label for="role">Role *</label>
             <select
               id="role"

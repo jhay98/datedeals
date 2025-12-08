@@ -1,7 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { DealService } from '../../../core/services/deal.service';
 import { BusinessService } from '../../../core/services/business.service';
 import { AuthService } from '../../../core/services/auth.service';
@@ -19,6 +19,7 @@ export class DealListComponent implements OnInit {
   private dealService = inject(DealService);
   private businessService = inject(BusinessService);
   private authService = inject(AuthService);
+  private router = inject(Router);
 
   Math = Math;
 
@@ -112,6 +113,24 @@ export class DealListComponent implements OnInit {
   nextPage(): void {
     if (this.currentPage < this.totalPages - 1) {
       this.onPageChange(this.currentPage + 1);
+    }
+  }
+
+  editDeal(dealId: number): void {
+    this.router.navigate(['/admin/deals/edit', dealId]);
+  }
+
+  deleteDeal(dealId: number): void {
+    if (confirm('Are you sure you want to delete this deal? This action cannot be undone.')) {
+      this.dealService.deleteDeal(dealId).subscribe({
+        next: () => {
+          this.loadDeals();
+        },
+        error: (error) => {
+          this.errorMessage = 'Failed to delete deal';
+          console.error('Error deleting deal:', error);
+        }
+      });
     }
   }
 

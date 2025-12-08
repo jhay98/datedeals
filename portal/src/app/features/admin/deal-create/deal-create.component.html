@@ -26,17 +26,28 @@
 
       <form (ngSubmit)="onSubmit()" #dealForm="ngForm">
         <div class="form-row">
-          <div class="form-group">
+          <div class="form-group code-group">
             <label for="code">Deal Code *</label>
-            <input
-              type="text"
-              id="code"
-              name="code"
-              [(ngModel)]="deal.code"
-              required
-              [disabled]="isSubmitting"
-              placeholder="e.g., SUMMER2024"
-            />
+            <div class="input-with-button">
+              <input
+                type="text"
+                id="code"
+                name="code"
+                [(ngModel)]="deal.code"
+                required
+                [disabled]="isSubmitting"
+                placeholder="e.g., SUMMER2024"
+              />
+              <button
+                type="button"
+                class="btn-generate"
+                (click)="onGenerateSku()"
+                [disabled]="isSubmitting"
+                title="Generate random SKU"
+              >
+                Generate
+              </button>
+            </div>
           </div>
 
           <div class="form-group">
@@ -84,31 +95,74 @@
           ></textarea>
         </div>
 
-        <div class="form-row">
+        <div class="form-group">
+          <label>Expiry Type</label>
+          <div class="radio-group">
+            <label class="radio-label">
+              <input
+                type="radio"
+                name="expiryType"
+                [(ngModel)]="expiryType"
+                value="none"
+                (change)="onExpiryTypeChange()"
+                [disabled]="isSubmitting"
+              />
+              <span>None</span>
+            </label>
+            <label class="radio-label">
+              <input
+                type="radio"
+                name="expiryType"
+                [(ngModel)]="expiryType"
+                value="date"
+                (change)="onExpiryTypeChange()"
+                [disabled]="isSubmitting"
+              />
+              <span>Expiry Date</span>
+            </label>
+            <label class="radio-label">
+              <input
+                type="radio"
+                name="expiryType"
+                [(ngModel)]="expiryType"
+                value="lifetime"
+                (change)="onExpiryTypeChange()"
+                [disabled]="isSubmitting"
+              />
+              <span>Lifetime (Days)</span>
+            </label>
+          </div>
+        </div>
+
+        @if (expiryType === 'date') {
           <div class="form-group">
-            <label for="expiryDate">Expiry Date</label>
+            <label for="expiryDate">Expiry Date *</label>
             <input
               type="datetime-local"
               id="expiryDate"
               name="expiryDate"
               [(ngModel)]="deal.expiryDate"
               [disabled]="isSubmitting"
+              required
             />
           </div>
+        }
 
+        @if (expiryType === 'lifetime') {
           <div class="form-group">
-            <label for="lifetimeDays">Lifetime (Days)</label>
+            <label for="lifetimeDays">Lifetime (Days) *</label>
             <input
               type="number"
               id="lifetimeDays"
               name="lifetimeDays"
               [(ngModel)]="deal.lifetimeDays"
               [disabled]="isSubmitting"
-              min="0"
+              min="1"
               placeholder="e.g., 30"
+              required
             />
           </div>
-        </div>
+        }
 
         <div class="form-group">
           <label for="commissionPercentage">Commission Percentage</label>

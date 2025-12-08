@@ -86,6 +86,24 @@ export class BusinessListComponent implements OnInit {
     this.router.navigate(['/admin/coupons'], { queryParams: { businessId } });
   }
 
+  editBusiness(businessId: number): void {
+    this.router.navigate(['/admin/businesses/edit', businessId]);
+  }
+
+  deleteBusiness(businessId: number): void {
+    if (confirm('Are you sure you want to delete this business? This action cannot be undone.')) {
+      this.businessService.deleteBusiness(businessId).subscribe({
+        next: () => {
+          this.loadBusinesses();
+        },
+        error: (error) => {
+          this.errorMessage = 'Failed to delete business';
+          console.error('Error deleting business:', error);
+        }
+      });
+    }
+  }
+
   logout(): void {
     this.authService.logout();
   }

@@ -23,7 +23,7 @@
         </div>
         <div class="detail-row">
           <span class="label">Value:</span>
-          <span class="value">R{{ coupon.valuePrice?.toFixed(2) }}</span>
+          <span class="value">R{{ coupon.valuePrice!.toFixed(2) }}</span>
         </div>
         @if (coupon.expireDate) {
           <div class="detail-row">
@@ -73,7 +73,7 @@
         <div class="success-icon">✓</div>
         <p>{{ successMessage }}</p>
         @if (coupon?.redeemDate) {
-          <p class="redeem-date">Redeemed on: {{ coupon.redeemDate | date:'dd MMM yyyy HH:mm' }}</p>
+          <p class="redeem-date">Redeemed on: {{ coupon?.redeemDate | date:'dd MMM yyyy HH:mm' }}</p>
         }
       </div>
       
